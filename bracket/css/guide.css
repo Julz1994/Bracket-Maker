@@ -1,0 +1,238 @@
+/* ============================================================
+   GUIDE.CSS — Guided tour overlay, spotlight, and tooltip
+   ============================================================ */
+
+/* ── Guide Intro Modal ────────────────────────────────────── */
+.guide-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 50010;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.82);
+  backdrop-filter: blur(6px);
+}
+
+.guide-intro.open { display: flex; }
+
+.guide-intro__card {
+  background: var(--color-surface);
+  border: 1px solid rgba(245, 200, 66, 0.25);
+  border-radius: var(--radius-xl);
+  padding: 36px 30px;
+  width: 350px;
+  text-align: center;
+  box-shadow: var(--shadow-lg);
+  animation: pop-in 0.22s var(--ease-out);
+}
+
+.guide-intro__icon {
+  font-size: 32px;
+  margin-bottom: 14px;
+  line-height: 1;
+}
+
+.guide-intro__title {
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--color-gold);
+  margin-bottom: 10px;
+}
+
+.guide-intro__desc {
+  font-size: 13px;
+  color: var(--color-muted);
+  line-height: 1.7;
+  margin-bottom: 24px;
+}
+
+.guide-intro__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+
+/* ── Guide Backdrop ───────────────────────────────────────── */
+.guide-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50000;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s var(--ease-out);
+}
+
+.guide-backdrop.on {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ── Spotlight Cutout ─────────────────────────────────────── */
+.guide-spotlight {
+  position: fixed;
+  border-radius: var(--radius-lg);
+  box-shadow:
+    0 0 0 9999px rgba(0, 0, 0, 0.82),
+    0 0 0 2px var(--color-gold),
+    0 0 20px rgba(245, 200, 66, 0.15);
+  transition: all 0.34s var(--ease-out);
+  z-index: 50001;
+  pointer-events: none;
+}
+
+.guide-spotlight.pulse {
+  animation: guide-ring 1.9s ease-in-out infinite;
+}
+
+@keyframes guide-ring {
+  0%, 100% {
+    box-shadow:
+      0 0 0 9999px rgba(0, 0, 0, 0.82),
+      0 0 0 2px var(--color-gold),
+      0 0 0 8px rgba(245, 200, 66, 0.28);
+  }
+  50% {
+    box-shadow:
+      0 0 0 9999px rgba(0, 0, 0, 0.82),
+      0 0 0 2px var(--color-gold),
+      0 0 0 16px rgba(245, 200, 66, 0);
+  }
+}
+
+/* ── Guide Tooltip ────────────────────────────────────────── */
+.guide-tooltip {
+  position: fixed;
+  z-index: 50002;
+  width: 290px;
+  background: var(--color-surface);
+  border: 1px solid rgba(245, 200, 66, 0.3);
+  border-radius: var(--radius-xl);
+  padding: 18px;
+  box-shadow: var(--shadow-lg);
+  transition:
+    top 0.34s var(--ease-out),
+    left 0.34s var(--ease-out);
+  pointer-events: auto;
+}
+
+/* Tooltip arrow */
+.guide-tooltip::before {
+  content: '';
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  background: var(--color-surface);
+  border: 1px solid rgba(245, 200, 66, 0.3);
+  transform: rotate(45deg);
+}
+
+/* Arrow directions */
+.guide-tooltip--top::before    { top: -5px; left: 18px; border-bottom: none; border-right: none; }
+.guide-tooltip--bottom::before { bottom: -5px; left: 18px; border-top: none; border-left: none; }
+.guide-tooltip--left::before   { left: -5px; top: 18px; border-right: none; border-bottom: none; }
+.guide-tooltip--none::before   { display: none; }
+
+.guide-tooltip__badge {
+  display: inline-block;
+  background: var(--color-gold-dim);
+  border: 1px solid rgba(245, 200, 66, 0.2);
+  border-radius: 99px;
+  padding: 2px 10px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--color-gold);
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.guide-tooltip__title {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: var(--color-text);
+}
+
+.guide-tooltip__body {
+  font-size: 12px;
+  color: var(--color-muted);
+  line-height: 1.65;
+  margin-bottom: 14px;
+}
+
+/* ── Guide Footer ─────────────────────────────────────────── */
+.guide-tooltip__footer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.guide-dots {
+  display: flex;
+  gap: 4px;
+  flex: 1;
+  align-items: center;
+}
+
+.guide-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 99px;
+  background: var(--color-border-hi);
+  cursor: pointer;
+  transition: background 0.2s var(--ease-out), width 0.2s var(--ease-out);
+}
+
+.guide-dot.on {
+  background: var(--color-gold);
+  width: 14px;
+}
+
+.guide-nav {
+  display: flex;
+  gap: 4px;
+}
+
+/* Ghost button used inside guide */
+.guide-ghost-btn {
+  background: transparent;
+  border: none;
+  color: var(--color-muted);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 5px 6px;
+  border-radius: var(--radius);
+  transition: color var(--duration) var(--ease-out);
+}
+
+.guide-ghost-btn:hover { color: var(--color-text); }
+
+/* Step navigation buttons */
+.guide-step-btn {
+  padding: 5px 11px;
+  border-radius: var(--radius);
+  border: 1px solid var(--color-border-hi);
+  background: var(--color-card);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background var(--duration) var(--ease-out);
+}
+
+.guide-step-btn:hover { background: rgba(255, 255, 255, 0.07); }
+
+.guide-step-btn--primary {
+  background: var(--color-gold);
+  color: #0a0a0f;
+  border-color: var(--color-gold);
+}
+
+.guide-step-btn--primary:hover { background: #f7d55a; }

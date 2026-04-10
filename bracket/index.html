@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bracket Predictor</title>
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/layout.css" />
+  <link rel="stylesheet" href="css/bracket.css" />
+  <link rel="stylesheet" href="css/guide.css" />
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════════════════
+       TOPBAR
+  ═══════════════════════════════════════════════════════ -->
+  <header id="topbar">
+    <div id="logo">BRACKET</div>
+    <div id="tour-title" class="tour-title">Setup</div>
+
+    <nav id="topbar-actions" class="hidden" aria-label="Bracket actions">
+      <button class="btn btn--guide" id="btn-guide" title="Take a guided tour">
+        ? Guide
+      </button>
+      <button class="btn" id="btn-edit" title="Go back to team setup">
+        ✎ Edit
+      </button>
+      <button class="btn" id="btn-undo" title="Undo last action" style="opacity:.4">
+        ↺ Undo
+      </button>
+      <button class="btn" id="btn-reset" title="Reset all predictions">
+        ⟳ Reset
+      </button>
+      <div class="btn-divider"></div>
+      <button class="btn" id="btn-fit" title="Fit bracket to screen">
+        ⤢ Fit
+      </button>
+      <button class="btn" id="btn-export" title="Download as HTML file">
+        ↓ Export
+      </button>
+      <button class="btn btn--primary" id="btn-share" title="Copy share link">
+        ⤤ Share
+      </button>
+    </nav>
+  </header>
+
+  <div id="app">
+
+    <!-- ═══════════════════════════════════════════════════
+         SETUP SCREEN
+    ═══════════════════════════════════════════════════ -->
+    <section id="setup-screen" aria-label="Tournament setup">
+      <div class="setup-layout">
+
+        <div class="setup-hero">
+          <div class="setup-hero__badge">BRACKET PREDICTOR</div>
+          <h1 class="setup-hero__title">Build Your<br />Tournament</h1>
+          <p class="setup-hero__desc">
+            Generate single or double elimination brackets in seconds.
+            Click to advance winners, track scores, and share results instantly.
+          </p>
+          <ul class="setup-hero__features">
+            <li>✓ Single &amp; Double Elimination</li>
+            <li>✓ Drag &amp; drop rearranging</li>
+            <li>✓ Shareable URL — no sign-up</li>
+            <li>✓ Works fully offline</li>
+          </ul>
+
+          <div class="setup-hero__download">
+            <button class="btn btn--download" id="btn-download">
+              ↓ Download Offline App
+            </button>
+            <span class="setup-hero__download-hint">
+              Single HTML file &middot; No internet needed
+            </span>
+          </div>
+        </div>
+
+        <div class="setup-form-card">
+          <h2 class="setup-form-card__title">Create Bracket</h2>
+          <p class="setup-form-card__sub">Fill in the details below to get started.</p>
+
+          <div class="field" id="f-name">
+            <label for="inp-name">Tournament Name</label>
+            <input
+              type="text"
+              id="inp-name"
+              placeholder="e.g. MPL PH Season 17"
+              autocomplete="off"
+            />
+          </div>
+
+          <div class="field-row">
+            <div class="field" id="f-fmt">
+              <label for="inp-fmt">Format</label>
+              <select id="inp-fmt">
+                <option value="single">Single Elimination</option>
+                <option value="double">Double Elimination</option>
+              </select>
+            </div>
+            <div class="field" id="f-seed">
+              <label for="inp-seed">Seeding</label>
+              <select id="inp-seed">
+                <option value="seq">As entered</option>
+                <option value="rand">Randomize</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field" id="f-teams">
+            <label for="inp-teams">
+              Teams
+              <span id="team-count" class="field__counter">(0 entered)</span>
+            </label>
+            <textarea
+              id="inp-teams"
+              placeholder="Team Alpha&#10;Team Beta&#10;Team Gamma&#10;...one per line, max 64"
+            ></textarea>
+            <p class="field__error" id="err-teams">
+              Please enter at least 2 team names.
+            </p>
+          </div>
+
+          <div class="setup-form-footer">
+            <span class="setup-form-footer__hint">Byes are handled automatically.</span>
+            <button class="btn btn--primary btn--lg" id="btn-create">
+              Create Bracket →
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════
+         BRACKET SCREEN
+    ═══════════════════════════════════════════════════ -->
+    <section id="bracket-screen" class="hidden" aria-label="Bracket view">
+
+      <!-- Sidebar -->
+      <aside id="sidebar" aria-label="Teams list">
+        <div class="sidebar__header">
+          <h3 class="sidebar__heading">Teams</h3>
+          <input
+            type="text"
+            id="sidebar-search"
+            class="sidebar__search"
+            placeholder="Filter…"
+            aria-label="Filter teams"
+          />
+        </div>
+        <div id="sidebar-list" class="sidebar__list" role="list"></div>
+        <p class="sidebar__tip">
+          Drag onto a slot, or tap to select then tap a slot to place.
+        </p>
+      </aside>
+
+      <!-- Canvas -->
+      <div id="canvas-wrap" class="canvas-wrap">
+        <div id="bracket-root" class="bracket-root"></div>
+        <div id="champ-area" class="champ-area"></div>
+      </div>
+
+    </section>
+
+  </div><!-- /#app -->
+
+  <!-- ═══════════════════════════════════════════════════════
+       UTILITY UI (toasts, modal, guide)
+  ═══════════════════════════════════════════════════════ -->
+
+  <!-- Toasts -->
+  <div id="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Confirm Modal -->
+  <div class="overlay" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal">
+      <h3 class="modal__title" id="modal-title">Confirm</h3>
+      <p class="modal__body" id="modal-body">Are you sure?</p>
+      <div class="modal__actions">
+        <button class="btn" id="modal-no">Cancel</button>
+        <button class="btn btn--danger" id="modal-yes">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Guide Intro -->
+  <div id="guide-intro" class="guide-intro" role="dialog" aria-modal="true" aria-label="Quick guide">
+    <div class="guide-intro__card">
+      <div class="guide-intro__icon">🏆</div>
+      <h2 class="guide-intro__title">Quick Guide</h2>
+      <p class="guide-intro__desc">
+        Take a 60-second tour to learn how to create your bracket,
+        advance winners, and share your results.
+      </p>
+      <div class="guide-intro__actions">
+        <button class="btn btn--primary" id="guide-start-btn">Start Tour →</button>
+        <button class="guide-ghost-btn" id="guide-skip-btn">Skip, I'll figure it out</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Guide Overlay -->
+  <div id="guide-backdrop" class="guide-backdrop" aria-hidden="true">
+    <div id="guide-spotlight" class="guide-spotlight"></div>
+    <div id="guide-tooltip" class="guide-tooltip guide-tooltip--none">
+      <div class="guide-tooltip__badge" id="guide-badge">Step 1 of 9</div>
+      <h3 class="guide-tooltip__title" id="guide-head">Title</h3>
+      <p class="guide-tooltip__body" id="guide-body">Body</p>
+      <div class="guide-tooltip__footer">
+        <div class="guide-dots" id="guide-dots" role="tablist"></div>
+        <div class="guide-nav">
+          <button class="guide-ghost-btn" id="guide-close-btn">✕ End</button>
+          <button class="guide-step-btn" id="guide-prev-btn">← Back</button>
+          <button class="guide-step-btn guide-step-btn--primary" id="guide-next-btn">Next →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/utils.js"></script>
+  <script src="js/download.js"></script>
+  <script src="js/bracket.js"></script>
+  <script src="js/guide.js"></script>
+  <script src="js/main.js"></script>
+
+</body>
+</html>
